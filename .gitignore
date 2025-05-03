@@ -1,0 +1,10 @@
+# byte‑code / caches
+__pycache__/
+*.py[cod]
+# envs
+.env/
+.venv/
+# Jupyter checkpoints
+.ipynb_checkpoints/
+# output artefacts
+output/
