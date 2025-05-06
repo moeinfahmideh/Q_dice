@@ -74,7 +74,8 @@ def main() -> None:
                 seq = composer.generate()
                 out_file = OUT_DIR / f"composition_{i}.mxl"
                 assemble(seq, MXL_DIR, out_file)
-                print(f"[{i}/{count}] Saved {out_file.name}")
+                print(f"[{i}/{count}] Saved")
+                print(seq)
                 log.write(f"auto_{i}: {seq}")
 
     elif mode == "2":
