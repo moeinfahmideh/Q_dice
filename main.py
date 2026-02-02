@@ -4,9 +4,14 @@ import sys, time
 from table import load_lookup_table
 from composer import Composer
 from assembler import assemble
+from assembler import assemble
+from assembler_midi import assemble_midi
+
 
 TABLE_CSV = Path("UE_lookup.csv")
 MXL_DIR   = Path("MusicXML")
+MIDI_DIR  = Path("MusicMIDI")
+
 OUT_DIR   = Path("output")
 LOG_FILE  = OUT_DIR / "sequences.log"
 
@@ -43,6 +48,13 @@ def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     table = load_lookup_table(TABLE_CSV)
+    print("Choose snippet source:\n  1) MusicXML (.mxl snippets)\n  2) MusicMIDI (.mid snippets)")
+    source = input("Enter 1 or 2: ").strip()
+    use_midi = (source == "2")
+    if source not in ("1", "2"):
+        print("Invalid source. Please run again and choose 1 or 2.")
+        sys.exit(1)
+
     cols = list("ABCDEFGHIJKLMNOPQRSTUVWXY")
 
     print("Choose mode:\n  1) Quantum‑dice compositions\n  2) Custom sequence")
@@ -54,9 +66,16 @@ def main() -> None:
         with LOG_FILE.open("a") as log:
             for i in range(1, count + 1):
                 seq = composer.generate()
-                out_file = OUT_DIR / f"composition_{i}.mxl"
-                assemble(seq, MXL_DIR, out_file)
-                print(f"[{i}/{count}] Saved {out_file.stem}.mxl & .mid")
+                if use_midi:
+                    out_file = OUT_DIR / f"composition_{i}.mid"
+                    assemble_midi(seq, MIDI_DIR, out_file)
+                    print(f"[{i}/{count}] Saved {out_file.name}")
+                else:
+                    out_file = OUT_DIR / f"composition_{i}.mxl"
+                    assemble(seq, MXL_DIR, out_file)
+                    print(f"[{i}/{count}] Saved {out_file.stem}.mxl & .mid")
+
+
                 log.write(f"auto_{i}: {seq}\n")
 
     elif mode == "2":
@@ -65,12 +84,15 @@ def main() -> None:
         seq.append(188)
 
         timestamp = time.strftime("%Y%m%d-%H%M%S")
-        out_file  = OUT_DIR / f"composition_custom_{timestamp}.mxl"
-        assemble(seq, MXL_DIR, out_file)
+        if use_midi:
+            out_file  = OUT_DIR / f"composition_custom_{timestamp}.mid"
+            assemble_midi(seq, MIDI_DIR, out_file)
+            print(f"Saved {out_file.name}")
+        else:
+            out_file  = OUT_DIR / f"composition_custom_{timestamp}.mxl"
+            assemble(seq, MXL_DIR, out_file)
+            print(f"Saved {out_file.stem}.mxl & .mid")
 
-        with LOG_FILE.open("a") as log:
-            log.write(f"custom_{timestamp}: {seq}\n")
-        print(f"Saved {out_file.stem}.mxl & .mid")
 
     else:
         print("Invalid mode. Please run again and choose 1 or 2.")
