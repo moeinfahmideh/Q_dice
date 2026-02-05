@@ -1,5 +1,5 @@
 pandas
-qiskit==1.*             # meta‑package (Terra) – but execute() removed
-qiskit-aer              # simulator providing AerSimulator
+qiskit==1.*            
+qiskit-aer             
 qiskit-ibm-provider 
 music21
